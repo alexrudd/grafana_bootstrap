@@ -82,7 +82,17 @@ Run Grafana bootstrap:
 ```bash
 ./grafana_bootstrap \
   -endpoint="https://grafana.monitoring.example.com" \
-  -config="example_config.yml" \
+  -config="./config/example_config.yml" \
+  -pass="adminpass" \
+  -debug-logging \
+
+# Or run using Docker
+docker run \
+  -v $(pwd)/dashboards:/dashboards \
+  -v $(pwd)/config:/config \
+  alexrudd/grafana_bootstrap \
+  -endpoint="https://grafana.monitoring.example.com" \
+  -config="./config/example_config.yml" \
   -pass="adminpass" \
   -debug-logging \
 ```
@@ -96,7 +106,7 @@ API keys can only be created by an admin user, through the Grafana web ui.
 ```yml
 organisations:
   - name: "Internal Devs"
-    apiKey: "eyJrIjoiczFHT2I3clREcmVZNzBDdUdnMlRxOFd6VWdITmpMRjEiLCJuIjoibWFuYWdlbWVudCIsImlkIjoxfQ=="
+    apiKey: "eyJrIjoiczFHT2I7clREcmVZNzBDdUrgjhixOFd6VWdITmpMRjEiLCJuIjoibWFuYWdlbWVudCIsImlkIjoxfQ=="
 ```
 
 Running the bootstrapper again should now succeed.
@@ -118,5 +128,11 @@ This is mostly a very dumb and hacky tool, feel free to contribute.
 Built and tested using `go version go1.7.4 linux/amd64`
 
 ```bash
+# For just the binary...
 go build
+
+# or for Docker image...
+CGO_ENABLED=0 GOOS=linux go build
+[ -e ca-certificates.crt ] || wget https://curl.haxx.se/ca/cacert.pem -O ca-certificates.crt
+docker build -t alexrudd/grafana_bootstrap .
 ```
